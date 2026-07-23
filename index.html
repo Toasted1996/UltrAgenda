@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UltrAgenda — Agenda inteligente para barberías y estéticas</title>
+<meta name="description" content="La primera agenda inteligente para barberías y estéticas: la IA agenda, confirma y recuerda turnos por WhatsApp — y si alguien cancela, reasigna el turno sola.">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="./image-slot.js"></script>
+  <script type="text/babel" src="./ios-frame.jsx"></script>
+  <style>
+    body { margin: 0; background: #F9F9F9; }
+    a { color: #111111; }
+    a:hover { color: #4A4A4A; }
+    ::selection { background: #CCFF00; color: #111111; }
+    input::placeholder { color: #8A8A8A; }
+    input:focus { box-shadow: 4px 4px 0 #111111; }
+    .cta-btn:hover { transform: translate(-2px,-2px); box-shadow: 4px 4px 0 #111111; }
+    .cta-btn { transition: transform .15s ease, box-shadow .15s ease; }
+    .nav-link { position: relative; }
+    .nav-link::after { content: ""; position: absolute; left: 0; bottom: -4px; width: 0; height: 2px; background: #111111; transition: width .2s ease; }
+    .nav-link:hover::after { width: 100%; }
+    @keyframes floatCard { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes typingBounce { 0%, 60%, 100% { transform: translateY(0); opacity: 0.5; } 30% { transform: translateY(-4px); opacity: 1; } }
+    @keyframes tickPop { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
+    .chat-card { animation: floatCard 5s ease-in-out infinite; }
+    .chat-msg-in { animation: fadeSlideUp .4s ease both; }
+    .typing-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #4A4A4A; animation: typingBounce 1.1s infinite; }
+    @keyframes livePulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(1.3); } }
+    .live-dot { animation: livePulse 2.2s ease-in-out infinite; }
+    @keyframes notifSlide { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: translateY(0); } }
+    .notif-in { animation: notifSlide .5s ease both; }
+    @keyframes slotPop { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+    .slot-in { animation: slotPop .35s ease both; }
+    .cta-label-full { display: inline; }
+    .cta-label-short { display: none; }
+    @media (max-width: 700px) {
+      .nav-text-link { display: none !important; }
+      .cta-label-full { display: none; }
+      .cta-label-short { display: inline; }
+    }
+    @media (max-width: 900px) { .chat-card { transform: scale(0.88); } }
+    @media (max-width: 480px) { .chat-card { transform: scale(0.78); } }
+  </style>
+</helmet>
+
+<div style="position: relative; min-height: 100vh; background: #F9F9F9; font-family: 'Inter', sans-serif;">
+  <div style="position: absolute; top: 0; left: 0; right: 0; height: 900px; pointer-events: none; background-image: radial-gradient(circle, rgba(17,17,17,0.55) 1.5px, transparent 1.6px); background-size: 26px 26px; background-position: -13px -13px; -webkit-mask-image: radial-gradient(ellipse 85% 65% at 50% 0%, #000 40%, transparent 88%); mask-image: radial-gradient(ellipse 85% 65% at 50% 0%, #000 40%, transparent 88%);"></div>
+
+  <nav style="position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 18px clamp(16px, 4vw, 48px); background: rgba(249,249,249,0.9); backdrop-filter: blur(6px); border-bottom: 2px solid #111111;">
+    <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 20px; color: #111111;">UltrAgenda</div>
+    <div style="display: flex; align-items: center; gap: clamp(12px, 3vw, 40px);">
+      <a href="#beneficios" class="nav-link nav-text-link" style="text-decoration: none; font-weight: 600; font-size: 16px; white-space: nowrap;">Beneficios</a>
+      <a href="#como-funciona" class="nav-link nav-text-link" style="text-decoration: none; font-weight: 600; font-size: 16px; white-space: nowrap;">Cómo funciona</a>
+      <a href="#acceso" class="cta-btn" style="text-decoration: none; background: #CCFF00; color: #111111; padding: 12px 18px; font-weight: 700; font-size: 14px; border: 2px solid #111111; box-shadow: 3px 3px 0 #111111; white-space: nowrap;">
+        ACCESO ANTICIPADO
+      </a>
+    </div>
+  </nav>
+
+  <main style="position: relative; padding: clamp(140px, 26vw, 220px) clamp(20px, 5vw, 48px) 100px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+    <div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: #FFFFFF; border: 2px solid #111111; box-shadow: 3px 3px 0 #111111; font-size: clamp(11px, 3vw, 13px); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #111111; margin-bottom: 28px;">
+      <span style="width: 8px; height: 8px; background: #CCFF00; border: 1.5px solid #111111; border-radius: 50%; display: inline-block; flex-shrink: 0;"></span>
+      Impulsado por IA · Para barberías y estéticas
+    </div>
+
+    <h1 style="font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: clamp(36px, 8vw, 72px); line-height: 1.08; color: #111111; max-width: 900px; margin: 0; text-wrap: pretty;">DEJA DE PERDER DINERO POR SILLAS VACÍAS.</h1>
+
+    <h2 style="font-family: 'Inter', sans-serif; font-weight: 400; font-size: clamp(16px, 2.6vw, 22px); color: #4A4A4A; max-width: 640px; margin: 24px 0 0; line-height: 1.5; text-wrap: pretty;">La primera agenda inteligente para barberías y estéticas: la IA agenda, confirma y recuerda turnos por WhatsApp — y si alguien cancela, reasigna el turno sola para mantener tu local lleno.</h2>
+
+    <form id="acceso" style="margin-top: 40px; display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 480px;">
+      <input type="tel" required placeholder="Tu número de WhatsApp..." value="{{ phone }}" onchange="{{ setPhone }}" style="flex: 1 1 260px; min-width: 0; padding: 18px 22px; font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 500; color: #111111; background: #FFFFFF; border: 2px solid #111111; outline: none; box-sizing: border-box;" />
+      <button type="button" onclick="{{ handleSubmit }}" class="cta-btn" style="display: flex; align-items: center; justify-content: center; gap: 10px; padding: 18px 24px; background: #CCFF00; color: #111111; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 15px; border: 2px solid #111111; cursor: pointer; white-space: nowrap; box-shadow: 4px 4px 0 #111111; flex: 1 1 auto;">
+        QUIERO ACCESO ANTICIPADO <span aria-hidden="true">→</span>
+      </button>
+    </form>
+
+    <p style="margin-top: 18px; font-size: 14px; color: #4A4A4A; font-weight: 500;">🔒 Sin tarjeta de crédito. Solo te avisaremos cuando tu demo esté lista.</p>
+    <p style="margin-top: 6px; font-size: 14px; color: #4A4A4A; font-weight: 500;">Funciona sobre el WhatsApp que ya usás. Sin instalar nada nuevo.</p>
+
+    <div style="display: flex; align-items: center; gap: 10px; margin-top: 22px; padding: 10px 18px; background: #FFFFFF; border: 1.5px solid #111111;">
+      <div style="display: flex;">
+        <span style="width: 22px; height: 22px; border-radius: 50%; background: #CCFF00; border: 1.5px solid #111111; margin-left: -8px;"></span>
+        <span style="width: 22px; height: 22px; border-radius: 50%; background: #E5E5E5; border: 1.5px solid #111111; margin-left: -8px;"></span>
+        <span style="width: 22px; height: 22px; border-radius: 50%; background: #F9F9F9; border: 1.5px solid #111111; margin-left: -8px;"></span>
+      </div>
+      <span style="font-size: 13px; font-weight: 600; color: #111111;">+128 barberías y estéticas ya se sumaron a la lista</span>
+    </div>
+
+    <div style="display: flex; gap: clamp(28px, 6vw, 48px); margin-top: 64px; padding-top: 32px; border-top: 2px dashed #111111; width: 100%; max-width: 620px; justify-content: center; flex-wrap: wrap;">
+      <div style="text-align: center;">
+        <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: clamp(24px, 5vw, 32px); color: #111111;">+30%</div>
+        <div style="font-size: 13px; color: #4A4A4A; font-weight: 600;">Sillas ocupadas</div>
+      </div>
+      <div style="text-align: center;">
+        <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: clamp(24px, 5vw, 32px); color: #111111;">24/7</div>
+        <div style="font-size: 13px; color: #4A4A4A; font-weight: 600;">Agendamiento y recuperación</div>
+      </div>
+      <div style="text-align: center;">
+        <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: clamp(24px, 5vw, 32px); color: #111111;">0</div>
+        <div style="font-size: 13px; color: #4A4A4A; font-weight: 600;">Llamadas manuales</div>
+      </div>
+    </div>
+    <p style="margin-top: 14px; font-size: 12px; color: #8A8A8A; max-width: 500px;">*Objetivo estimado de referencia — UltrAgenda está en fase de pre-lanzamiento, aún no es un resultado medido.</p>
+  </main>
+
+  <section id="beneficios" style="position: relative; padding: 80px clamp(20px, 5vw, 48px); max-width: 1100px; margin: 0 auto;">
+    <h3 style="font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: clamp(26px, 4vw, 38px); color: #111111; text-align: center; margin: 0 0 40px;">Beneficios</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
+      <div style="background: #FFFFFF; border: 2px solid #111111; box-shadow: 6px 6px 0 #111111; padding: 24px;">
+        <div style="width: 40px; height: 40px; margin-bottom: 14px; border-radius: 50%; background: #111111; color: #CCFF00; font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center;">01</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px; color: #111111; margin-bottom: 6px;">Agendamiento 24/7 por WhatsApp</div>
+        <div style="font-size: 14px; color: #4A4A4A; line-height: 1.5;">La IA agenda, confirma y envía recordatorios a tus clientes sin que nadie lo atienda.</div>
+      </div>
+      <div style="background: #FFFFFF; border: 2px solid #111111; box-shadow: 6px 6px 0 #111111; padding: 24px;">
+        <div style="width: 40px; height: 40px; margin-bottom: 14px; border-radius: 50%; background: #111111; color: #CCFF00; font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center;">02</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px; color: #111111; margin-bottom: 6px;">Menos llamadas manuales</div>
+        <div style="font-size: 14px; color: #4A4A4A; line-height: 1.5;">La IA escribe por WhatsApp a tus clientes; tu equipo deja de perder tiempo llamando uno por uno.</div>
+      </div>
+      <div style="background: #FFFFFF; border: 2px solid #111111; box-shadow: 6px 6px 0 #111111; padding: 24px;">
+        <div style="width: 40px; height: 40px; margin-bottom: 14px; border-radius: 50%; background: #111111; color: #CCFF00; font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center;">03</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px; color: #111111; margin-bottom: 6px;">Recuperación automática de canceladas</div>
+        <div style="font-size: 14px; color: #4A4A4A; line-height: 1.5;">Cada cita cancelada se reasigna sola desde la lista de espera, sin que muevas un dedo.</div>
+      </div>
+      <div style="background: #FFFFFF; border: 2px solid #111111; box-shadow: 6px 6px 0 #111111; padding: 24px;">
+        <div style="width: 40px; height: 40px; margin-bottom: 14px; border-radius: 50%; background: #111111; color: #CCFF00; font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center;">04</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px; color: #111111; margin-bottom: 6px;">Más sillas ocupadas</div>
+        <div style="font-size: 14px; color: #4A4A4A; line-height: 1.5;">Ningún hueco en la agenda queda vacío más de lo necesario.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="como-funciona" style="position: relative; padding: 40px clamp(20px, 5vw, 48px) 80px; max-width: 1000px; margin: 0 auto;">
+    <h3 style="font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: clamp(26px, 4vw, 38px); color: #111111; text-align: center; margin: 0 0 40px;">Cómo funciona</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px;">
+      <div style="text-align: center;">
+        <div style="width: 48px; height: 48px; margin: 0 auto 14px; border-radius: 50%; background: #111111; color: #CCFF00; font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 20px; display: flex; align-items: center; justify-content: center;">1</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px; color: #111111; margin-bottom: 6px;">La IA agenda y confirma</div>
+        <div style="font-size: 14px; color: #4A4A4A; line-height: 1.5;">Tus clientes reservan y confirman turnos por WhatsApp, 24/7, sin que nadie los atienda.</div>
+      </div>
+      <div style="text-align: center;">
+        <div style="width: 48px; height: 48px; margin: 0 auto 14px; border-radius: 50%; background: #111111; color: #CCFF00; font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 20px; display: flex; align-items: center; justify-content: center;">2</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px; color: #111111; margin-bottom: 6px;">Envía recordatorios</div>
+        <div style="font-size: 14px; color: #4A4A4A; line-height: 1.5;">Antes de cada cita, para reducir ausencias y mantener la agenda al día.</div>
+      </div>
+      <div style="text-align: center;">
+        <div style="width: 48px; height: 48px; margin: 0 auto 14px; border-radius: 50%; background: #111111; color: #CCFF00; font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 20px; display: flex; align-items: center; justify-content: center;">3</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px; color: #111111; margin-bottom: 6px;">Si cancelan, reasigna sola</div>
+        <div style="font-size: 14px; color: #4A4A4A; line-height: 1.5;">Le ofrece el turno libre al siguiente cliente en tu lista de espera y llena la silla.</div>
+      </div>
+    </div>
+  </section>
+
+  <section ref="{{ setRootRef }}" style="position: relative; width: 100%; padding: 90px 3vw; box-sizing: border-box; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px;">
+    <image-slot id="hero-bg-photo" shape="rect" placeholder="Foto B/N: barbero trabajando o salón elegante" style="position: absolute; inset: 0; width: 100%; height: 100%; filter: grayscale(1) blur(1.5px) brightness(0.85);"></image-slot>
+    <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.15); pointer-events: none;"></div>
+
+    <div style="position: relative; z-index: 2; display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: #FFFFFF; border: 2px solid #111111; box-shadow: 3px 3px 0 #111111; font-size: clamp(11px, 3vw, 13px); font-weight: 700; letter-spacing: 0.04em; color: #111111; text-align: center; max-width: 90vw; text-wrap: pretty;">
+      Así gestiona tu agenda la IA — desde agendar hasta recuperar una cancelación
+    </div>
+
+    <div style="position: relative; z-index: 2; width: 100%; max-width: 1100px; display: flex; align-items: flex-start; justify-content: center; gap: 40px; flex-wrap: wrap;">
+
+      <div style="flex: 2 1 480px; min-width: 280px; background: #FFFFFF; border: 2px solid #111111; box-shadow: 10px 10px 0 #111111; padding: 24px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 8px;">
+          <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 17px; color: #111111;">Agenda de hoy · Barbería Central</div>
+          <div style="font-size: 12px; color: #4A4A4A; font-weight: 600;">9:00 – 18:00</div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
+          <sc-for list="{{ slotViews }}" as="slot" hint-placeholder-count="9">
+            <div class="slot-in" style="background: {{ slot.bg }}; border: 2px {{ slot.dashedStyle }} {{ slot.border }}; padding: 10px; min-height: 78px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; color: #111111;">{{ slot.time }}</div>
+              <div>
+                <div style="font-size: 12px; font-weight: 700; color: {{ slot.textColor }}; text-decoration: {{ slot.strike }}; line-height: 1.25;">{{ slot.name }}</div>
+                <div style="font-size: 11px; color: #8A8A8A; margin-bottom: 4px;">{{ slot.service }}</div>
+                <span style="font-size: 10px; font-weight: 700; color: {{ slot.badgeTextColor }}; background: {{ slot.badgeBg }}; border: 1.5px solid {{ slot.border }}; padding: 2px 6px; white-space: nowrap;">{{ slot.badge }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 20px; margin-top: 20px; padding-top: 16px; border-top: 2px dashed #111111; flex-wrap: wrap;">
+          <div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: clamp(24px, 4vw, 32px); color: #111111;">{{ revenueLabel }}</div>
+            <div style="font-size: 12px; color: #4A4A4A; font-weight: 600;">Ingreso del día</div>
+          </div>
+          <sc-if value="{{ recoveredLabel }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: #F9FFE0; border: 1.5px solid #111111; font-size: 12px; font-weight: 700; color: #111111;">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: #CCFF00; border: 1.5px solid #111111; display: inline-block;"></span>
+              +{{ recoveredLabel }} recuperados por IA
+            </div>
+          </sc-if>
+        </div>
+      </div>
+
+      <div class="chat-card" style="flex: 1 1 240px; max-width: 280px; min-width: 220px; box-shadow: 10px 10px 0 #111111; border-radius: 48px; align-self: center;">
+        <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" width="{{ 280 }}" height="{{ 580 }}" hint-size="280px,580px" dark="{{ true }}">
+          <div style="display: flex; flex-direction: column; height: 100%; background: linear-gradient(180deg, #1a1a1a, #111111); font-family: 'Inter', sans-serif; padding: 78px 14px 0; box-sizing: border-box;">
+            <div style="text-align: center; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 40px; color: #FFFFFF; letter-spacing: -1px;">9:41</div>
+            <div style="text-align: center; font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px;">Hoy</div>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <sc-for list="{{ notifs }}" as="notif" hint-placeholder-count="0">
+                <div class="notif-in" style="display: flex; gap: 10px; align-items: flex-start; background: rgba(255,255,255,0.14); backdrop-filter: blur(6px); border-radius: 14px; padding: 10px 12px;">
+                  <div style="width: 26px; height: 26px; border-radius: 7px; background: #CCFF00; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 11px; color: #111111; flex-shrink: 0;">UA</div>
+                  <div style="min-width: 0;">
+                    <div style="font-size: 11px; font-weight: 700; color: #FFFFFF; margin-bottom: 2px;">UltrAgenda IA</div>
+                    <div style="font-size: 12px; color: rgba(255,255,255,0.85); line-height: 1.35;">{{ notif.text }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </x-import>
+      </div>
+    </div>
+
+    <a href="#acceso" class="cta-btn" style="position: relative; z-index: 2; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; padding: 16px 26px; background: #CCFF00; color: #111111; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 15px; border: 2px solid #111111; box-shadow: 4px 4px 0 #111111; white-space: nowrap; margin-top: 8px;">
+      QUIERO ACCESO ANTICIPADO <span aria-hidden="true">→</span>
+    </a>
+  </section>
+
+  <footer style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 32px clamp(20px, 5vw, 48px); border-top: 2px solid #111111; background: #F9F9F9;">
+    <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 18px; color: #111111;">UltrAgenda</div>
+    <a href="#acceso" style="text-decoration: none; font-weight: 600; font-size: 14px; color: #111111;">Contacto · hola@ultragenda.app</a>
+    <div style="font-size: 13px; color: #4A4A4A;">© 2026 UltrAgenda</div>
+  </footer>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  SLOTS = [
+    { time: '9:00', name: 'Ana R.', service: 'Corte', price: 1800 },
+    { time: '10:00', name: 'Marcos P.', service: 'Barba', price: 1600 },
+    { time: '11:00', name: 'Carla B.', service: 'Color', price: 2600 },
+    { time: '12:00', name: 'Lucas F.', service: 'Corte', price: 1800 },
+    { time: '14:00', name: 'María G.', service: 'Corte + color', price: 3000 },
+    { time: '15:00', name: 'Pedro L.', service: 'Barba', price: 1600 },
+    { time: '16:00', name: 'Juan', service: 'Corte', price: 2200, preName: 'Roberto S.', preService: 'Barba', prePrice: 1900 },
+    { time: '17:00', name: 'Sofía R.', service: 'Corte', price: 1800 },
+    { time: '18:00', name: 'Diego T.', service: 'Corte', price: 2000 },
+  ];
+  NOTIF_AT_TICK = {
+    5: 'Nueva cita confirmada — María G., 14:00, Corte + color',
+    6: 'Recordatorio enviado a Pedro L. para mañana 15:00',
+  };
+  PHASE_DUR = { 1: 2000, 2: 3200, 3: 1800, 4: 1800, 5: 3000 };
+  TICK_MS = 350;
+
+  state = { phone: "", phase: 1, tick: 0, notifs: [], running: false };
+
+  componentDidMount() {
+    this.reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (this.reduced) {
+      this.setState({
+        phase: 5, tick: 9,
+        notifs: [
+          { id: 'n-cancel', text: 'Cancelación detectada — 16:00, buscando reemplazo...' },
+          { id: 'n-recover', text: 'Turno cubierto — Juan tomó el horario de las 16:00 ✓' },
+        ],
+      });
+      return;
+    }
+    this.observer = new IntersectionObserver((entries) => {
+      const e = entries[0];
+      if (e.isIntersecting) {
+        if (!this.state.running) this.startLoop();
+      } else if (this.state.running) {
+        this.stopLoop();
+      }
+    }, { threshold: 0.3 });
+    if (this.rootEl) this.observer.observe(this.rootEl);
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this._t);
+    clearInterval(this._tickTimer);
+    if (this.observer) this.observer.disconnect();
+  }
+
+  setRootRef = (el) => {
+    this.rootEl = el;
+    if (el && this.observer) this.observer.observe(el);
+  };
+
+  startLoop = () => {
+    this.setState({ phase: 1, tick: 0, notifs: [], running: true });
+    this._t = setTimeout(() => this.nextPhase(1), this.PHASE_DUR[1]);
+  };
+
+  stopLoop = () => {
+    clearTimeout(this._t);
+    clearInterval(this._tickTimer);
+    this.setState({ phase: 1, tick: 0, notifs: [], running: false });
+  };
+
+  nextPhase = (from) => {
+    if (!this.state.running) return;
+    if (from === 1) {
+      this.setState({ phase: 2, tick: 0 });
+      let t = 0;
+      this._tickTimer = setInterval(() => {
+        t += 1;
+        const notifText = this.NOTIF_AT_TICK[t];
+        this.setState(s => ({
+          tick: t,
+          notifs: notifText ? [...s.notifs, { id: 'n' + t, text: notifText }].slice(-3) : s.notifs,
+        }));
+        if (t >= this.SLOTS.length) clearInterval(this._tickTimer);
+      }, this.TICK_MS);
+      this._t = setTimeout(() => this.nextPhase(2), this.PHASE_DUR[2]);
+    } else if (from === 2) {
+      clearInterval(this._tickTimer);
+      this.setState(s => ({ phase: 3, notifs: [...s.notifs, { id: 'n-cancel', text: 'Cancelación detectada — 16:00, buscando reemplazo...' }].slice(-3) }));
+      this._t = setTimeout(() => this.nextPhase(3), this.PHASE_DUR[3]);
+    } else if (from === 3) {
+      this.setState(s => ({ phase: 4, notifs: [...s.notifs, { id: 'n-recover', text: 'Turno cubierto — Juan tomó el horario de las 16:00 ✓' }].slice(-3) }));
+      this._t = setTimeout(() => this.nextPhase(4), this.PHASE_DUR[4]);
+    } else if (from === 4) {
+      this.setState({ phase: 5 });
+      this._t = setTimeout(() => this.nextPhase(5), this.PHASE_DUR[5]);
+    } else if (from === 5) {
+      this.startLoop();
+    }
+  };
+
+  fmt = (n) => '$' + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+  renderVals() {
+    const { phase, tick, notifs, phone } = this.state;
+    const slotViews = this.SLOTS.map((s, i) => {
+      const revealed = phase >= 3 ? true : (phase === 2 ? tick > i : false);
+      const base = {
+        time: s.time, name: '', service: '', bg: '#F9F9F9', border: '#111111',
+        dashedStyle: 'dashed', textColor: '#8A8A8A', strike: 'none',
+        badge: 'Libre', badgeBg: '#F9F9F9', badgeTextColor: '#8A8A8A',
+      };
+      if (i === 6) {
+        if (phase <= 2) {
+          if (revealed) return { ...base, name: s.preName, service: s.preService, bg: '#FFFFFF', dashedStyle: 'solid', textColor: '#111111', badge: 'Confirmado', badgeBg: '#EAF9EE', badgeTextColor: '#111111' };
+          return base;
+        }
+        if (phase === 3) return { ...base, name: s.preName, service: s.preService, bg: '#FBEAEA', border: '#B42318', dashedStyle: 'dashed', textColor: '#8A8A8A', strike: 'line-through', badge: 'Cancelado', badgeBg: '#FBEAEA', badgeTextColor: '#B42318' };
+        return { ...base, name: s.name, service: s.service, bg: '#F9FFE0', dashedStyle: 'solid', textColor: '#111111', badge: 'Recuperado por IA', badgeBg: '#CCFF00', badgeTextColor: '#111111' };
+      }
+      if (!revealed) return base;
+      return { ...base, name: s.name, service: s.service, bg: '#FFFFFF', dashedStyle: 'solid', textColor: '#111111', badge: 'Confirmado', badgeBg: '#EAF9EE', badgeTextColor: '#111111' };
+    });
+
+    let total = 0;
+    this.SLOTS.forEach((s, i) => {
+      const revealed = phase >= 3 ? true : (phase === 2 ? tick > i : false);
+      if (!revealed) return;
+      if (i === 6) total += phase <= 2 ? s.prePrice : (phase === 3 ? 0 : s.price);
+      else total += s.price;
+    });
+
+    return {
+      phone, setPhone: e => this.setState({ phone: e.target.value }),
+      handleSubmit: e => { e.preventDefault(); alert("¡Gracias! Te avisaremos por WhatsApp: " + phone); },
+      setRootRef: this.setRootRef,
+      slotViews,
+      notifs,
+      revenueLabel: this.fmt(total),
+      recoveredLabel: phase >= 4 ? this.fmt(this.SLOTS[6].price) : null,
+    };
+  }
+}
+</script>
+</body>
+</html>
