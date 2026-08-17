@@ -136,8 +136,8 @@
         <div>
           <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;">
             <input type="text" required="" placeholder="Tu WhatsApp o email..." value="{{ contactValue }}" onchange="{{ setContactValue }}" style="flex: 1 1 260px; min-width: 0; padding: 18px 22px; font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 500; color: #111111; background: #FFFFFF; border: 2px solid {{ inputBorderColor }}; outline: none; box-sizing: border-box;">
-            <button type="button" onclick="{{ handleSubmit }}" class="cta-btn" style="display: flex; align-items: center; justify-content: center; gap: 10px; padding: 18px 24px; background: #CCFF00; color: #111111; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 15px; border: 2px solid #111111; cursor: pointer; white-space: nowrap; box-shadow: 4px 4px 0 #111111; flex: 1 1 auto;">
-              QUIERO ACCESO ANTICIPADO <span aria-hidden="true">→</span>
+            <button type="button" onclick="{{ handleSubmit }}" class="cta-btn" style="display: flex; align-items: center; justify-content: center; gap: 10px; padding: 18px 24px; background: {{ submitBtnBg }}; color: #111111; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 15px; border: 2px solid #111111; cursor: pointer; white-space: nowrap; box-shadow: 4px 4px 0 #111111; flex: 1 1 auto;">
+              {{ submitBtnLabel }} <span aria-hidden="true">→</span>
             </button>
           </div>
           <sc-if value="{{ contactError }}" hint-placeholder-val="{{ false }}">
@@ -567,7 +567,7 @@ class Component extends DCLogic {
     return { ...base, name: c.name, service: c.service };
   }) }));
 
-  state = { contactMethod: "whatsapp", contactValue: "", phase: 1, tick: 0, notifs: [], running: false, submitted: false, contactError: '', deviceView: 'panel' };
+  state = { contactMethod: "whatsapp", contactValue: "", phase: 1, tick: 0, notifs: [], running: false, submitted: false, submitting: false, contactError: '', deviceView: 'panel' };
 
   componentDidMount() {
     this.reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -647,7 +647,7 @@ class Component extends DCLogic {
   fmt = (n) => '$' + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
   renderVals() {
-    const { phase, tick, notifs, contactMethod, contactValue, submitted, contactError, deviceView } = this.state;
+    const { phase, tick, notifs, contactMethod, contactValue, submitted, submitting, contactError, deviceView } = this.state;
     const isWhatsapp = contactMethod === 'whatsapp';
     const slotViews = this.SLOTS.map((s, i) => {
       const revealed = phase >= 3 ? true : (phase === 2 ? tick > i : false);
@@ -684,8 +684,11 @@ class Component extends DCLogic {
       isSubmitted: submitted,
       isNotSubmitted: !submitted,
       successChannel: contactValue.includes('@') ? 'correo' : 'WhatsApp',
+      submitBtnLabel: submitting ? 'ENVIANDO...' : 'QUIERO ACCESO ANTICIPADO',
+      submitBtnBg: submitting ? '#E5E5E5' : '#CCFF00',
       handleSubmit: e => {
         if (e && e.preventDefault) e.preventDefault();
+        if (this.state.submitting) return;
         const v = contactValue.trim();
         const isEmail = v.includes('@');
         if (isEmail) {
@@ -694,7 +697,20 @@ class Component extends DCLogic {
           const digits = v.replace(/\D/g, '');
           if (digits.length < 8) return this.setState({ contactError: 'Ingresá un correo válido o un número de WhatsApp.' });
         }
-        this.setState({ submitted: true, contactError: '' });
+        this.setState({ submitting: true, contactError: '' });
+        fetch('/api/lead', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contact: v }),
+        })
+          .then(r => r.json().then(body => ({ ok: r.ok, body })))
+          .then(({ ok, body }) => {
+            if (!ok) throw new Error((body && body.error) || 'No se pudo enviar.');
+            this.setState({ submitting: false, submitted: true, contactError: '' });
+          })
+          .catch(() => {
+            this.setState({ submitting: false, contactError: 'No pudimos enviarlo. Probá de nuevo en un momento.' });
+          });
       },
       setRootRef: this.setRootRef,
       slotViews,
